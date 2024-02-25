@@ -70,18 +70,11 @@ async def ask_password(client: Client, message):
     if not await verupikkals(client, message):
         return
 
-    # Ask the user for the password
-    await message.reply('Please enter the password (more than three characters):')
+    # Extract the password from the command
+    parts = message.text.split(' ', 1)
+    if len(parts) != 2 or len(parts[1]) < 4:
+        return await message.reply('Please enter a password (more than three characters) with the command.')
 
-@Client.on_message(filters.private)
-async def process_password(client: Client, message):
-    if not await verupikkals(client, message):
-        return
-
-    # Check if the user replied with the password
-    if message.reply_to_message and message.reply_to_message.from_user.id == client.get_me().id and len(message.text) > 3:
-        password = message.text.strip()
-        # Your code to save the password or use it in link generation
-        await message.reply(f"The password has been set to: {password}")
-    else:
-        await message.reply('Please reply to the command "/passlink" to provide the password.')
+    password = parts[1]
+    # Your code to process the password
+    await message.reply(f"The password has been set to: {password}")
