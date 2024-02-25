@@ -58,6 +58,10 @@ async def gen_link_s(client: Client, message):
     if password and await verupikkals(client, message):
         share_link = f"{share_link}&password={password}"
         reply_text += f"\n\n🔒 Password-Protected Link: {share_link}"
+        # Reply to the admin with the password-protected link
+        await message.reply(f"Password-Protected Link: {share_link}")
+    
+    keyboard.append([InlineKeyboardButton("Copy Link", callback_data=f"copy_link:{share_link}")])
     
     await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -75,7 +79,6 @@ async def process_password(client: Client, message):
         return
 
     # Check if the user replied with the password
-     # Check if the user replied with the password
     if message.reply_to_message and message.reply_to_message.from_user.id == client.get_me().id and len(message.text) > 3:
         password = message.text.strip()
         # Your code to save the password or use it in link generation
