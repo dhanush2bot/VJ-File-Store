@@ -20,13 +20,19 @@ async def verupikkals(bot, message):
         return False
     return True
 
-@Client.on_message(filters.command(['link', 'plink']))
+@Client.on_message(filters.private & filters.command(['passlink']))
+async def process_password(client: Client, message):
+    if not await verupikkals(client, message):
+        return
+
+    if message.reply_to_message and message.reply_to_message.from_user.id == client.get_me().id and len(message.command) > 1 and len(message.command[1]) > 3:
+        password = message.command[1]
+        await message.reply(f"The password has been set to: {password}")
+    else:
+        await message.reply('Please reply to the command "/passlink" to provide the password.')
+
+@Client.on_message(filters.private & filters.command(['link', 'plink']))
 async def gen_link_s(client: Client, message):
-    # Parse the message to extract the password parameter
-    password = None
-    if len(message.command) > 2 and message.command[1] == "password":
-        password = message.command[2]
-    
     replied = message.reply_to_message
     if not replied:
         return await message.reply('Reply to a message to get a shareable link.')
@@ -36,45 +42,30 @@ async def gen_link_s(client: Client, message):
     if message.has_protected_content:
         return await message.reply("okDa")
 
-    
+    password = None
+    if len(message.command) > 1 and len(message.command[1]) > 3:
+        password = message.command[1]
+
     file_id, ref = unpack_new_file_id((getattr(replied, file_type.value)).file_id)
     string = 'filep_' if message.text.lower().strip() == "/plink" else 'file_'
     string += file_id
     outstr = base64.urlsafe_b64encode(string.encode("ascii")).decode().strip("=")
     user_id = message.from_user.id
     user = await get_user(user_id)
-    # Get the bot's username
     bot_username = (await client.get_me()).username
     share_link = f"https://t.me/{bot_username}?start={outstr}"
     short_link = await get_short_link(user, share_link)
+
     keyboard = [[InlineKeyboardButton("Original Link", url=share_link)]]
     if short_link:
         keyboard[0].insert(0, InlineKeyboardButton("Short Link", url=short_link))
-        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- {short_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━━━━━━━━➣"
-    else:
-        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟᴏɴᴋ :- {share_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━━━━━━━━➣"
-
-    # Check if the password is provided and is valid
-    if password and await verupikkals(client, message):
-        share_link = f"{share_link}&password={password}"
-        reply_text += f"\n\n🔒 Password-Protected Link: {share_link}"
-        # Reply to the admin with the password-protected link
-        await message.reply(f"Password-Protected Link: {share_link}")
     
+    if password:
+        share_link += f"&password={password}"
+        reply_text = f"Password-protected link: {share_link}"
+    else:
+        reply_text = f"Shareable link: {share_link}"
+
     keyboard.append([InlineKeyboardButton("Copy Link", callback_data=f"copy_link:{share_link}")])
     
     await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
-
-@Client.on_message(filters.command(['passlink']))
-async def ask_password(client: Client, message):
-    if not await verupikkals(client, message):
-        return
-
-    # Extract the password from the command
-    parts = message.text.split(' ', 1)
-    if len(parts) != 2 or len(parts[1]) < 4:
-        return await message.reply('Please enter a password (more than three characters) with the command.')
-
-    password = parts[1]
-    # Your code to process the password
-    await message.reply(f"The password has been set to: {password}")
