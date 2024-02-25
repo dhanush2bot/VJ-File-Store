@@ -75,8 +75,10 @@ async def process_password(client: Client, message):
         return
 
     # Check if the user replied with the password
+     # Check if the user replied with the password
     if message.reply_to_message and message.reply_to_message.from_user.id == client.get_me().id and len(message.text) > 3:
         password = message.text.strip()
         # Your code to save the password or use it in link generation
+        await message.reply(f"The password has been set to: {password}")
     else:
         await message.reply('Please reply to the command "/passlink" to provide the password.')
