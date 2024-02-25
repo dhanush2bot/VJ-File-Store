@@ -4,9 +4,29 @@ from pyrogram import filters, Client, enums
 from plugins.database import unpack_new_file_id
 from clone_plugins.users_api import get_user, get_short_link
 import base64
+from pymongo import MongoClient
+from config import DB_URI as MONGO_URL
+
+mongo_client = MongoClient(MONGO_URL)
+mongo_db = mongo_client["cloned_vjbotz"]
+
+
+async def verupikkals(bot, message):
+    id = bot.me.id
+    owner = mongo_db.bots.find_one({'bot_id': id})
+    ownerid = int(owner['user_id'])
+    if ownerid != message.from_user.id:
+        await message.reply_text("Only the bot owner can use this command.")
+        return False
+    return True
 
 @Client.on_message(filters.command(['link', 'plink']))
 async def gen_link_s(client: Client, message):
+    # Parse the message to extract the password parameter
+    password = None
+    if len(message.command) > 2 and message.command[1] == "password":
+        password = message.command[2]
+    
     replied = message.reply_to_message
     if not replied:
         return await message.reply('Reply to a message to get a shareable link.')
@@ -33,5 +53,30 @@ async def gen_link_s(client: Client, message):
         reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- {short_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━━━━━━━━➣"
     else:
         reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟᴏɴᴋ :- {share_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━━━━━━━━➣"
+
+    # Check if the password is provided and is valid
+    if password and await verupikkals(client, message):
+        share_link = f"{share_link}&password={password}"
+        reply_text += f"\n\n🔒 Password-Protected Link: {share_link}"
+    
     await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
-  
+
+@Client.on_message(filters.command(['passlink']))
+async def ask_password(client: Client, message):
+    if not await verupikkals(client, message):
+        return
+
+    # Ask the user for the password
+    await message.reply('Please enter the password (more than three characters):')
+
+@Client.on_message(filters.private)
+async def process_password(client: Client, message):
+    if not await verupikkals(client, message):
+        return
+
+    # Check if the user replied with the password
+    if message.reply_to_message and message.reply_to_message.from_user.id == client.get_me().id and len(message.text) > 3:
+        password = message.text.strip()
+        # Your code to save the password or use it in link generation
+    else:
+        await message.reply('Please reply to the command "/passlink" to provide the password.')
