@@ -29,12 +29,7 @@ async def gen_link_s(client: Client, message):
     keyboard = [[InlineKeyboardButton("Original Link", url=share_link)]]
     if short_link:
         keyboard[0].insert(0, InlineKeyboardButton("Short Link", url=short_link))
+        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- <copy>{share_link}</copy>\n┣\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- <copy>{short_link}</copy>\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
     else:
-        keyboard[0].insert(0, InlineKeyboardButton("Copy Original Link", callback_data=f"copy_link:{share_link}"))
-    await message.reply(f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- {short_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━━━━━━━━➣", reply_markup=InlineKeyboardMarkup(keyboard))
-
-@Client.on_callback_query(filters.regex(r'^copy_link:(.*)$'))
-async def copy_link(client: Client, query: CallbackQuery):
-    link = query.data.split(":")[1]
-    await query.message.copy(chat_id=query.from_user.id, reply_markup=None, caption=f"🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ: {link}")
-    await query.answer("Link copied!", show_alert=True)
+         reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟᴏɴᴋ :- <copy>{share_link}</copy>\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
+    await message.r
