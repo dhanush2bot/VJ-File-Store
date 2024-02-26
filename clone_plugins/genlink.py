@@ -26,16 +26,19 @@ async def gen_link_s(client: Client, message):
     user = await get_user(user_id)
     # Get the bot's username
     bot_username = (await client.get_me()).username
+
     share_link = f"https://t.me/{bot_username}?start={outstr}"
     short_link = await get_short_link(user, share_link)
     keyboard = [
         [InlineKeyboardButton("Original Link", callback_data=f"copy_link:{share_link}")],
         [InlineKeyboardButton("Short Link", callback_data=f"copy_link:{short_link}")]
-        ]
+    ]
+
     if short_link:
-        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- {short_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
+        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪ𝗻ᴋ :- {share_link}\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- {short_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
     else:
-        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
+        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪ𝗻ᴋ :- {share_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
+
     await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
 
 @Client.on_callback_query()
