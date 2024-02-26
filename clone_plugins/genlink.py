@@ -3,7 +3,7 @@ from pyrogram import filters, Client, enums
 from plugins.database import unpack_new_file_id
 from clone_plugins.users_api import get_user, get_short_link
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram import CallbackQuery
+from pyrogram.types import CallbackQuery
 import base64
 
 @Client.on_message(filters.command(['link', 'plink']))
