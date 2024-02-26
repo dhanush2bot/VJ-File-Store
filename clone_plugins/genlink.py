@@ -20,6 +20,13 @@ async def verupikkals(bot, message):
         return False
     return True
 
+import re
+from pyrogram import filters, Client, enums
+from plugins.database import unpack_new_file_id
+from clone_plugins.users_api import get_user, get_short_link
+import base64
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 @Client.on_message(filters.private & filters.command(['passlink']))
 async def process_password(client: Client, message):
     if not await verupikkals(client, message):
