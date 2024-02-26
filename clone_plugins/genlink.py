@@ -2,7 +2,8 @@ import re
 from pyrogram import filters, Client, enums
 from plugins.database import unpack_new_file_id
 from clone_plugins.users_api import get_user, get_short_link
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram import CallbackQuery
 import base64
 
 @Client.on_message(filters.command(['link', 'plink']))
@@ -28,8 +29,16 @@ async def gen_link_s(client: Client, message):
     short_link = await get_short_link(user, share_link)
     keyboard = [[InlineKeyboardButton("Original Link", url=share_link)]]
     if short_link:
-        keyboard[0].insert(0, InlineKeyboardButton("Short Link", url=short_link))
-        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- <copy>{share_link}</copy>\n┣\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- <copy>{short_link}</copy>\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
+        keyboard[0].insert(0, InlineKeyboardButton("Short Link", callback_data=f"copy_link:{short_link}"))
+        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n┣🔗 sʜᴏʀᴛ ʟɪɴᴋ :- Click 'Short Link' button to copy\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
     else:
-         reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟᴏɴᴋ :- <copy>{share_link}</copy>\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
-    await message.r
+        reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪɴᴋ :- {share_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
+    await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+@Client.on_callback_query()
+async def handle_callback_query(client, callback_query: CallbackQuery):
+    if callback_query.data.startswith("copy_link:"):
+        short_link = callback_query.data.split("copy_link:")[1]
+        await callback_query.answer("Link copied! Paste it where you need.")
+        await callback_query.message.reply(short_link)
