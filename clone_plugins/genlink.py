@@ -39,7 +39,7 @@ async def gen_link_s(client: Client, message):
     else:
         reply_text = f"╭━━❰ 𝗬𝗢𝗨𝗥 𝗟𝗜𝗡𝗞 𝗜𝗦 𝗥𝗘𝗔𝗗𝗬 ❱━━➣\n┣\n┣🔗 ᴏʀɪɢɪɴᴀʟ ʟɪ𝗻ᴋ :- {share_link}\n┣\n╰━━━━━━━━━━━━━━━━━━━━➣"
 
-    await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
+    await message.reply_text(reply_text, reply_markup=InlineKeyboardMarkup(keyboard))
 
 @Client.on_callback_query()
 async def handle_callback_query(client, callback_query: CallbackQuery):
@@ -47,3 +47,4 @@ async def handle_callback_query(client, callback_query: CallbackQuery):
         link = callback_query.data.split("copy_link:")[1]
         pyperclip.copy(link)
         await callback_query.answer("Link copied! Paste it where you need.")
+
