@@ -47,4 +47,3 @@ async def handle_callback_query(client, callback_query: CallbackQuery):
         link = callback_query.data.split("copy_link:")[1]
         pyperclip.copy(link)
         await callback_query.answer("Link copied! Paste it where you need.")
-
